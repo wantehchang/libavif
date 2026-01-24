@@ -170,7 +170,11 @@ static avifResult svtCodecEncodeImage(avifCodec * codec,
 #else
         svt_config->logical_processors = encoder->maxThreads;
 #endif
+#if SVT_AV1_CHECK_VERSION(4, 0, 0)
+        svt_config->aq_mode = 2;
+#else
         svt_config->enable_adaptive_quantization = 2;
+#endif
         // disable 2-pass
 #if SVT_AV1_CHECK_VERSION(0, 9, 0)
         svt_config->rc_stats_buffer = (SvtAv1FixedBuf) { NULL, 0 };
@@ -179,7 +183,7 @@ static avifResult svtCodecEncodeImage(avifCodec * codec,
         svt_config->rc_twopass_stats_in = (SvtAv1FixedBuf) { NULL, 0 };
 #endif
 
-        svt_config->rate_control_mode = 0; // CRF because enable_adaptive_quantization is 2
+        svt_config->rate_control_mode = 0; // CRF because aq_mode is 2
         if (alpha) {
             svt_config->min_qp_allowed = AVIF_CLAMP(encoder->minQuantizerAlpha, 0, 62);
             svt_config->max_qp_allowed = AVIF_CLAMP(encoder->maxQuantizerAlpha, 0, 63);
